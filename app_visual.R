@@ -3,13 +3,23 @@ library(shiny)
 library(shinythemes)
 library(ggplot2)
 library(dplyr)
+library(stringr)
 
 #Reading in Racer Data
 data.all <-read.csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
 
+#Pulling only last 5 months of data
+# data.all <- data.all %>% mutate(Date = str_sub(GameDate, 1, 10))
+# data.all$Date <- as.Date(data.all$Date, format = "%m/%d/%Y")
+# data.all <- data.all %>% filter(Date >= as.Date(Sys.Date()) - 180)
+
 #Filter Data
-data.all <- filter(data.all, FinishTime < 100)
+
+#data.all <- filter(data.all, FinishTime < 100)
 data.all <- filter(data.all, Body == "Bayes" | Body == "Nightingale" | Body == "Gauss")
+data.all <- filter(data.all, Level == "Tutorial" | Level == "Paired" | Level == "ChooseCar" | Level == "CreateCar")
+data.all <- filter(data.all, Track == "Tutorial" | Track == "StraightTrack" | Track == "OvalTrack" | Track == "8Track" | Track == "VeryComplexTrack"| Track == "ComplexTrack")
+
 
 #Changing to Factor/Character
 data.all$Level <- as.factor(data.all$Level)
@@ -42,7 +52,6 @@ data.all <- data.all %>% rename(Order = Order2, Order2 = Order)
 #Making Order a factor
 data.all$Order <- as.factor(data.all$Order)
 
-
 #To use for Inputs
 all_groups <- sort(unique(data.all$GroupID))
 all_players <- sort(unique(data.all$PlayerID))
@@ -72,10 +81,6 @@ ui <- fluidPage(
                   selectize = TRUE,
                   selected = "test"),
       
-              selectInput("levels", "Level",
-                  choices = all_levels,
-                  multiple = TRUE),
-      
                selectInput(inputId = "playerID",
                   label = "Player ID:",
                   choices =  c("all", all_players),
@@ -93,7 +98,7 @@ ui <- fluidPage(
                selectInput(inputId = "yvar",
                   label = "Y Variable:",
                   #columns of the dataset
-                  choices = c("FinishTime", "TimeTo30", "TimeTo60"),
+                  choices = c("FinishTime", "TimeTo30", "TimeTo60", "TopSpeed"),
                   selected = "FinishTime",
                   multiple = FALSE),
       
@@ -101,13 +106,13 @@ ui <- fluidPage(
               checkboxInput("summary", "Show Summary Statistics (For X Variable)", FALSE),
       
               selectInput(inputId = "color",
-                  label = "Color by",
+                  label = "Color by:",
                   choices = c("Body", "Engine", "Tire", "Track", "Order", "PlayerID"),
                   selected = "Body",
                   multiple = FALSE),
       
               selectInput(inputId = "facets",
-                  label = "Facet by",
+                  label = "Facet by:",
                   choices = c("None", "Body", "Engine", "Tire", "Track", "Order"),
                   selected = "None",
                   multiple = FALSE),
@@ -136,6 +141,13 @@ ui <- fluidPage(
                          selectize = TRUE,
                          selected = all_body),
              
+             selectInput(inputId = "levels", 
+                         label = "Filter by Level",
+                         choices = all_levels,
+                         multiple = TRUE,
+                         selectize = TRUE,
+                         selected = all_levels),
+                    
              selectInput(inputId = "track",
                          label = "Filter by Track", 
                          choices = all_track,
@@ -143,14 +155,41 @@ ui <- fluidPage(
                          selectize = TRUE,
                          selected = all_track),
              
-             selectInput(inputId = "order",
-                         label = "Filter by Order", 
-                         choices = all_order,
-                         multiple = TRUE,
-                         selectize = TRUE,
-                         selected = all_order)
+     
+            sliderInput(inputId = "order",
+                        label = "Choose Max Order",
+                        min = min(as.numeric(data.all$Order)),
+                        max = max(as.numeric(data.all$Order)),
+                        value = max(as.numeric(data.all$Order)),
+                        ticks = FALSE),
+            
+            numericInput(inputId = "outlier",
+                         label = "Remove Most Extreme N Values",
+                         value = 0,
+                         min = 0,
+                         width = "69%"),
+    
+            uiOutput("help")),
+    
+    
+    
+    
+    tabPanel("Instructions",
+             # a(h5("How to use this app"),
+             #   href="https://www.youtube.com/watch?v=JZDQVHVNC10",
+             #   aligh= "left", target="_blank"),
              
-             ))),
+             #p(h5("Write description here"), align = "left"),
+             
+             
+             a(h5("Instructor Resources"),
+               href="https://stat2labs.sites.grinnell.edu/racer.html", 
+               align="left", target = "_blank"))
+              
+             #p(h5("Write description here"), align = "left"))
+    
+
+    )),
   
     column(9, 
     mainPanel(
@@ -169,14 +208,36 @@ server <- function(input, output,session) {
   
   #Reactive Data
   plotDataR <- reactive({
+   
     
     if("all" %in% input$playerID){
-        gamedata <- filter(data.all, Level %in% input$levels, GroupID %in% input$groupID)
-        gamedata <- filter(gamedata, Body %in% input$body, Engine %in% input$engine, Tire %in% input$tire, Track %in% input$track, Order %in% input$order)
+        gamedata <- filter(data.all, GroupID %in% input$groupID)
+        gamedata <- filter(gamedata, Level %in% input$levels, Body %in% input$body, Engine %in% input$engine, Tire %in% input$tire, Track %in% input$track, as.numeric(Order) <= input$order)
+        
+        #Pulling Y Variable  
+        y <- gamedata %>% pull(input$yvar)
+        
+        #Requiring numeric input
+        req(input$outlier)
+        
+        #Removing Outliers
+        gamedata <- gamedata %>% arrange(y)
+        gamedata <- gamedata[1:(nrow(gamedata) - floor(input$outlier)),]
+          
         
     } else{
-      gamedata <- filter(data.all, Level %in% input$levels, PlayerID %in% input$playerID)
-      gamedata <- filter(gamedata, Body %in% input$body, Engine %in% input$engine, Tire %in% input$tire, Track %in% input$track, Order %in% input$order)
+      gamedata <- filter(data.all, PlayerID %in% input$playerID)
+      gamedata <- filter(gamedata, Level %in% input$levels, Body %in% input$body, Engine %in% input$engine, Tire %in% input$tire, Track %in% input$track, as.numeric(Order) <= input$order)
+      
+      #Pulling Y Variable  
+      y <- gamedata %>% pull(input$yvar)
+      
+      #Requiring numeric input
+      req(input$outlier)
+      
+      #Removing Outliers
+      gamedata <- gamedata %>% arrange(y)
+      gamedata <- gamedata[1:(nrow(gamedata) - floor(input$outlier)),]
     }
   })  
   
@@ -194,20 +255,20 @@ server <- function(input, output,session) {
                       selected = "all")
   })
   
+  #Dynamic Help Text
   
-  # Updates Levels based upon GroupID
-  observe({
-    req(input$groupID)   
-  
-      gamedata <- filter(data.all, GroupID %in% input$groupID)
-     
-      updateSelectInput(session, 
-                      "levels",
-                      choices = sort(unique(gamedata$Level)),
-                      selected = sort(unique(gamedata$Level))[c(1)])
+  output$help <- renderUI({
+    
+   plotData <- plotDataR()
+    
+    helpText(paste("Number of data points left: ", nrow(plotData)))
+    
   })
   
   
+  
+  
+
   #Creating Vizualizations
   output$Plot <- renderPlot({
     req(input$groupID)
