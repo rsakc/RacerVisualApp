@@ -169,26 +169,26 @@ ui <- fluidPage(
                          min = 0,
                          width = "69%"),
     
-            uiOutput("help")),
+            uiOutput("help"),
+            helpText("No points will be removed if the inputted number is larger than the data")),
+    
     
     
     
     
     tabPanel("Instructions",
-             # a(h5("How to use this app"),
+             
+             #p(h5(em("Instructions for using this App can be found here:")), align = "left"),
+             
+             # a(h5("Instructions"),
              #   href="https://www.youtube.com/watch?v=JZDQVHVNC10",
              #   aligh= "left", target="_blank"),
              
-             #p(h5("Write description here"), align = "left"),
-             
+             p(h5(em("The data for this App comes from an online racer game. Instructors can learn more here: ")), align = "left"),
              
              a(h5("Instructor Resources"),
                href="https://stat2labs.sites.grinnell.edu/racer.html", 
                align="left", target = "_blank"))
-              
-             #p(h5("Write description here"), align = "left"))
-    
-
     )),
   
     column(9, 
@@ -220,9 +220,17 @@ server <- function(input, output,session) {
         #Requiring numeric input
         req(input$outlier)
         
+        if(input$outlier < nrow(gamedata)){
+        
         #Removing Outliers
         gamedata <- gamedata %>% arrange(y)
         gamedata <- gamedata[1:(nrow(gamedata) - floor(input$outlier)),]
+        
+        } else {
+          
+         return(gamedata)
+          
+        }
           
         
     } else{
@@ -235,9 +243,17 @@ server <- function(input, output,session) {
       #Requiring numeric input
       req(input$outlier)
       
+      if(input$outlier < nrow(gamedata)){
       #Removing Outliers
       gamedata <- gamedata %>% arrange(y)
       gamedata <- gamedata[1:(nrow(gamedata) - floor(input$outlier)),]
+   
+      
+      } else {
+      
+        return(gamedata)
+      
+      }
     }
   })  
   
@@ -264,9 +280,6 @@ server <- function(input, output,session) {
     helpText(paste("Number of data points left: ", nrow(plotData)))
     
   })
-  
-  
-  
   
 
   #Creating Vizualizations
