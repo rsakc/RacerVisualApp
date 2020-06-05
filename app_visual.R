@@ -22,6 +22,8 @@ data.all <- filter(data.all, Body == "Bayes" | Body == "Nightingale" | Body == "
 data.all <- filter(data.all, Level == "Tutorial" | Level == "Paired" | Level == "ChooseCar" | Level == "CreateCar")
 data.all <- filter(data.all, Track == "Tutorial" | Track == "StraightTrack" | Track == "OvalTrack" | Track == "8Track" | Track == "VeryComplexTrack"| Track == "ComplexTrack")
 
+#Filtering NAs
+data.all <- filter(data.all, !(is.na(data.all$PlayerID)))
 
 #Changing to Factor/Character
 data.all$Level <- as.factor(data.all$Level)
