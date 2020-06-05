@@ -8,7 +8,7 @@ library(readr)
 library(curl)
  
 #Reading in Racer Data
-data.all <-read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
+data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
 
 #Pulling only last 5 months of data
 # data.all <- data.all %>% mutate(Date = str_sub(GameDate, 1, 10))
