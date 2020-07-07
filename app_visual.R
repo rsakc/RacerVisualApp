@@ -6,7 +6,7 @@ library(dplyr)
 library(stringr)
 library(readr)
 library(curl)
- 
+  
 #Reading in Racer Data
 data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
 
