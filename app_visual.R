@@ -1,4 +1,4 @@
-#Last Updated on July 14 2020
+#Last Updated on July 15 2020
 
 #Loading Libraries
 library(shiny)
@@ -9,8 +9,17 @@ library(stringr)
 library(readr)
 library(curl)
   
-#Reading in Racer Data
+#Importing Data
+n <- sample(c(0,1), size = 1)
+
+if(n == 0){
 data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
+
+} else{
+  data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
+}
+
+
 
 #Pulling only last 5 months of data
 # data.all <- data.all %>% mutate(Date = str_sub(GameDate, 1, 10))
