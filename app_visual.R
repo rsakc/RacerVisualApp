@@ -303,7 +303,7 @@ server <- function(input, output,session) {
         myplot <- ggplot(data = plotData, aes_string(x = input$xvar, y = input$yvar, color=input$color)) +
           geom_boxplot() +
           geom_point(position=position_dodge(width = 0.75), size = 3) +
-          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and colored by", input$color)) +
+          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and Colored by", input$color)) +
           theme_bw() +
           theme(axis.text.x = element_text(size = 18, angle = 50, hjust = 1), 
                 axis.title = element_text(size = 20), 
@@ -319,7 +319,7 @@ server <- function(input, output,session) {
         myplot <- ggplot(data = plotData, aes_string(x = input$xvar, y = input$yvar, color=input$color)) +
           geom_boxplot() +
           geom_point(position=position_dodge(width = 0.75), size = 3) +
-          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and colored by", input$color)) +
+          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and Colored by", input$color)) +
           theme_bw() +
           theme(axis.text.x = element_text(size = 18, angle = 50, hjust = 1), 
                 axis.title = element_text(size = 20), 
@@ -337,7 +337,7 @@ server <- function(input, output,session) {
         cols <- c("Bayes" = "blue", "Gauss" = "red", "Nightingale" = "orange")   
         myplot <- ggplot(data = plotData, aes_string(x = input$xvar, y = input$yvar, color=input$color), plot.title = element_text(size = 18)) +
           geom_point(position= position_dodge(width = 0.5), size = 3) +
-          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and colored by", input$color)) +
+          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and Colored by", input$color)) +
           theme_bw() +
           theme(axis.text.x = element_text(size = 18, angle = 50, hjust = 1), 
                 axis.title = element_text(size = 20), 
@@ -351,7 +351,7 @@ server <- function(input, output,session) {
       } else{
         myplot <- ggplot(data = plotData, aes_string(x = input$xvar, y = input$yvar, color=input$color), plot.title = element_text(size = 18)) +
           geom_point(position =position_dodge(width = 0.5), size = 3) +
-          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and colored by", input$color)) +
+          labs(x = input$xvar, y = input$yvar, title = paste("Plot of",input$yvar, "by",input$xvar, "and Colored by", input$color)) +
           theme_bw() +
           theme(axis.text.x = element_text(size = 18, angle = 50, hjust = 1), 
                 axis.title = element_text(size = 20), 
@@ -367,7 +367,7 @@ server <- function(input, output,session) {
     if (input$facets != "None") {
       #myplot <- myplot + facet_wrap(input$facets)
       myplot <- myplot + facet_wrap(as.formula(paste("~", input$facets))) +
-        labs(title = paste("Plot of",input$yvar, "by",input$xvar, "and Faceted by type of", input$facets)) +
+        labs(title = paste("Plot of",input$yvar, "by",input$xvar, "and Colored by", input$color, "and Faceted by", input$facets)) +
         theme(strip.text = element_text(size = 16))
     }
     
