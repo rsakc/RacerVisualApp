@@ -1,4 +1,4 @@
-#Last Updated on July 15 2020
+#Last Updated on July 22 2020
 
 #Loading Libraries
 library(shiny)
@@ -136,7 +136,11 @@ ui <- fluidPage(
                   selected = "None",
                   multiple = FALSE),
       
-              downloadButton('downloadData', label = "Racer Data")),
+              downloadButton('downloadData', label = "Racer Data"),
+              
+              a(h5("Instructor Resources"),
+                href="https://stat2labs.sites.grinnell.edu/racer.html", 
+                align="left", target = "_blank")),
     
     tabPanel("Filters",
              selectInput(inputId = "body",
@@ -189,26 +193,9 @@ ui <- fluidPage(
                          width = "69%"),
     
             uiOutput("help"),
-            helpText("No points will be removed if the inputted number is larger than the data")),
+            helpText("No points will be removed if the inputted number is larger than the data")))),
     
-    
-    
-    
-    
-    tabPanel("Instructions",
-             
-             #p(h5(em("Instructions for using this App can be found here:")), align = "left"),
-             
-             # a(h5("Instructions"),
-             #   href="https://www.youtube.com/watch?v=JZDQVHVNC10",
-             #   aligh= "left", target="_blank"),
-             
-             p(h5(em("The data for this App comes from an online racer game. Instructors can learn more here: ")), align = "left"),
-             
-             a(h5("Instructor Resources"),
-               href="https://stat2labs.sites.grinnell.edu/racer.html", 
-               align="left", target = "_blank"))
-    )),
+  
   
     column(9, 
     mainPanel(
