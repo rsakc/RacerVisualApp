@@ -1,4 +1,4 @@
-#Last Updated on July 22 2020
+#Last Updated on July 23 2020
 
 #Loading Libraries
 library(shiny)
@@ -18,8 +18,6 @@ data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer
 } else{
   data.all <-readr::read_csv("https://www.stat2games.sites.grinnell.edu/data/racer/getdata.php") 
 }
-
-
 
 #Pulling only last 5 months of data
 # data.all <- data.all %>% mutate(Date = str_sub(GameDate, 1, 10))
@@ -109,14 +107,12 @@ ui <- fluidPage(
       
                selectInput(inputId = "xvar",
                   label = "X Variable:",
-                  #columns of the dataset
                   choices = c("Body", "Engine", "Tire", "Track", "Order", "PlayerID"),
                   selected = "Body",
                   multiple = FALSE),
       
                selectInput(inputId = "yvar",
                   label = "Y Variable:",
-                  #columns of the dataset
                   choices = c("FinishTime", "TimeTo30", "TimeTo60", "TopSpeed"),
                   selected = "FinishTime",
                   multiple = FALSE),
@@ -215,7 +211,7 @@ server <- function(input, output,session) {
   #Reactive Data
   plotDataR <- reactive({
    
-    
+    #All player input selected
     if("all" %in% input$playerID){
         gamedata <- filter(data.all, GroupID %in% input$groupID)
         gamedata <- filter(gamedata, Level %in% input$levels, Body %in% input$body, Engine %in% input$engine, Tire %in% input$tire, Track %in% input$track, as.numeric(Order) <= input$order)
@@ -278,7 +274,6 @@ server <- function(input, output,session) {
   })
   
   #Dynamic Help Text
-  
   output$help <- renderUI({
     
    plotData <- plotDataR()
@@ -416,6 +411,8 @@ server <- function(input, output,session) {
       }
     })
     
+    
+    #Returning visual
     return(myplot)
     
   })
